@@ -1,5 +1,4 @@
 const { gql } = require('apollo-server-express');
-const { getSingleUser } = require('../controllers/user-controller');
 
 const typeDefs = gql`
     type User {
@@ -13,7 +12,9 @@ const typeDefs = gql`
         user: User
     }
     type Query {
+        # gets single user by id or username
         user(userID: ID!): User
+        # gets current user via context
         me: User
     }
     type Mutation {
