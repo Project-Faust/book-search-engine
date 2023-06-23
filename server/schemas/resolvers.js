@@ -32,16 +32,23 @@ const resolvers = {
             const token = signToken(user);
             return { token, user };
         },
-        // saveBook: async (_, { user, body }, context) => {
-        //     if (context.user) {
-        //         const book = await User.findOneAndUpdate(
-        //             { _id: user.id },
-        //             { $addToSet: { savedBooks: body } },
-        //             { new: true, runValidators: true }
-        //         );
+        saveBook: async (_, { book }, { user }) => {
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: user._id },
+                { $addToSet: { savedBooks: book } },
+                { new: true, runValidators: true }
+            );
+            return updatedUser;
+        },
+        deleteBook: async (_, { bookId }, { user }) => {
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: user._id },
+                { $pull: { savedBooks: { bookId } } },
+                { new: true }
+            );
+            return updatedUser;
+        },
 
-        //     }
-        // },
     },
 };
 
