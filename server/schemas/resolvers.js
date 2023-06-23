@@ -4,26 +4,22 @@ const { signToken } = require('../utils/auth');
 
 const resolvers = {
     Query: {
-        user: async (_, { userID }) => {
+        getSingleUser: async (_, { userID }) => {
             const foundUser = await User.findOne({
                 $or: [{ _id: userID }, { username: userID }],
             });
-
             if (!foundUser) {
                 throw new Error('Cannot find a user with this ID or username!');
             }
-
             return foundUser;
-        },
-        me: async (_, __, { currentUser }) => {
-            if (!currentUser) {
-                throw new Error('You are not logged in.');
-            }
-
-            return currentUser;
         },
     },
     Mutation: {
+        createUser: async (_, { username, email, password }) => {
+            const user = await User.create({ username, email, password });
+            const token = signToken(user);
+            return { token, user };
+        },
         login: async (_, { email, password }) => {
             const user = await User.findOne({ email });
             if (!user) {
@@ -35,6 +31,18 @@ const resolvers = {
             }
             const token = signToken(user);
             return { token, user };
-        }
-    }
-}
+        },
+        // saveBook: async (_, { user, body }, context) => {
+        //     if (context.user) {
+        //         const book = await User.findOneAndUpdate(
+        //             { _id: user.id },
+        //             { $addToSet: { savedBooks: body } },
+        //             { new: true, runValidators: true }
+        //         );
+
+        //     }
+        // },
+    },
+};
+
+module.exports = resolvers;
