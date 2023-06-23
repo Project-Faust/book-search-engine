@@ -22,5 +22,19 @@ const resolvers = {
 
             return currentUser;
         },
+    },
+    Mutation: {
+        login: async (_, { email, password }) => {
+            const user = await User.findOne({ email });
+            if (!user) {
+                throw new AuthenticationError('Username or password is incorrect');
+            }
+            const correctPw = await user.isCorrectPassword(password);
+            if (!correctPw) {
+                throw new AuthenticationError('Username or password is incorrect');
+            }
+            const token = signToken(user);
+            return { token, user };
+        }
     }
 }
