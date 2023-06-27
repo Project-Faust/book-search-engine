@@ -6,7 +6,15 @@ query getSingleUser($username: String!) {
         _id
         username
         email
-        savedBooks
+        savedBooks {
+            _id
+            authors
+            description
+            bookId
+            image
+            link
+            title
+          }
         }
     }
 `;
