@@ -34,7 +34,6 @@ export const ADD_BOOK = gql`
             image
             link
             title
-            }
         }
     }
 `;
