@@ -11,15 +11,18 @@ import { QUERY_ME } from '../utils/queries';
 import { REMOVE_BOOK } from '../utils/mutations';
 
 import Auth from '../utils/auth';
-import { removeBookId } from '../utils/localStorage';
-// import { set } from 'mongoose';
+import { removeBookId, getSavedBookIds } from '../utils/localStorage';
 
 const SavedBooks = () => {
   const [userData, setUserData] = useState({});
-  const { data } = useQuery(QUERY_ME);
-  const [removeBook] = useMutation(REMOVE_BOOK);
-
-
+  const { data } = useQuery(QUERY_ME, {
+    fetchPolicy: 'network-only',
+  });
+  const [removeBook] = useMutation(REMOVE_BOOK, {
+    refetchQueries: [{ query: QUERY_ME }],
+  });
+  console.log('_____')
+  console.log(data);
 
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length;
@@ -53,10 +56,15 @@ const SavedBooks = () => {
       const { data } = await removeBook({
         variables: { bookId },
       });
-
-      if (data.removeBook) {
-        setUserData(data.deleteBook.user);
+      console.log('_____');
+      console.log(data);
+      if (data && data.deleteBook) {
+        setUserData((prevUserData) => ({
+          ...prevUserData,
+          savedBooks: prevUserData.savedBooks.filter((book) => book._id !== bookId),
+        }));
         removeBookId(bookId);
+        getSavedBookIds();
       } else {
         throw new Error('Something went wrong.');
       }
@@ -72,7 +80,7 @@ const SavedBooks = () => {
 
   return (
     <>
-      <div fluid className="text-light bg-dark p-5">
+      <div fluid="true" className="text-light bg-dark p-5">
         <Container>
           <h1>Viewing saved books!</h1>
         </Container>
@@ -86,8 +94,8 @@ const SavedBooks = () => {
         <Row>
           {userData.savedBooks.map((book) => {
             return (
-              <Col md="4">
-                <Card key={book.bookId} border='dark'>
+              <Col key={book.bookId} md="4">
+                <Card border='dark'>
                   {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}
                   <Card.Body>
                     <Card.Title>{book.title}</Card.Title>
