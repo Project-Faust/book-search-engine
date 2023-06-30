@@ -6,13 +6,19 @@ const resolvers = {
     Query: {
         getSingleUser: async (_, { userID }) => {
             const foundUser = await User.findOne({
-                $or: [{ _id: userID }, { username: userID }],
-            });
+                _id: userID,
+              }).populate('savedBooks');
             if (!foundUser) {
                 throw new Error('Cannot find a user with this ID or username!');
             }
             return foundUser;
         },
+        me: async (_, __, context) => {
+            if (context.user) {
+                return User.findOne({ _id: context.user._id })
+            }
+            throw new AuthenticationError('You need to be logged in!');
+        }
     },
     Mutation: {
         createUser: async (_, { username, email, password }) => {
@@ -43,7 +49,13 @@ const resolvers = {
         deleteBook: async (_, { bookId }, context) => {
             const updatedUser = await User.findOneAndUpdate(
                 { _id: context.user._id },
-                { $pull: { savedBooks: bookId } },
+                {
+                    $pull: {
+                        savedBooks: {
+                            bookId
+                        },
+                    }
+                },
                 { new: true }
             );
             return updatedUser;
