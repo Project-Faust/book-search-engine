@@ -1,5 +1,7 @@
 
   <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"/><br/>
+  ![image](https://github.com/Project-Faust/book-search-engine/assets/30759236/a2a4d5c4-3cba-4b18-88e6-fdecdad21d67)<br/>
+
   ## Table of Contents
   * [Author](#authorName)
   * [Project Title](#projectName)
